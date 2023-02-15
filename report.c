@@ -55,12 +55,12 @@ void report_event(message_t msg, char *fmt, ...)
 {
     va_list ap;
     bool fatal = msg == MSG_FATAL;
-    static char *msg_name_text[N_MSG] = {
+    const static char *msg_name_text[N_MSG] = {
         "WARNING",
         "ERROR",
         "FATAL ERROR",
     };
-    char *msg_name = msg_name_text[2];
+    const static char *msg_name = msg_name_text[2];
     if (msg < N_MSG)
         msg_name = msg_name_text[msg];
     int level = N_MSG - msg - 1;
