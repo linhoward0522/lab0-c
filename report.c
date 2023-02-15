@@ -60,7 +60,7 @@ void report_event(message_t msg, char *fmt, ...)
         "ERROR",
         "FATAL ERROR",
     };
-    const static char *msg_name = msg_name_text[2];
+    const char *msg_name = msg_name_text[2];
     if (msg < N_MSG)
         msg_name = msg_name_text[msg];
     int level = N_MSG - msg - 1;
