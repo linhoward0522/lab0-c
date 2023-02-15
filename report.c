@@ -55,12 +55,13 @@ void report_event(message_t msg, char *fmt, ...)
 {
     va_list ap;
     bool fatal = msg == MSG_FATAL;
-    const static char *msg_name_text[N_MSG] = {
+    // cppcheck-suppress constVariable
+    static char *msg_name_text[N_MSG] = {
         "WARNING",
         "ERROR",
         "FATAL ERROR",
     };
-    const char *msg_name = msg_name_text[2];
+    char *msg_name = msg_name_text[2];
     if (msg < N_MSG)
         msg_name = msg_name_text[msg];
     int level = N_MSG - msg - 1;
