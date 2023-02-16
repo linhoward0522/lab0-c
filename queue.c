@@ -131,7 +131,7 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 /* Return number of elements in queue */
 int q_size(struct list_head *head)
 {
-    if (!head)
+    if (!head || list_empty(head))
         return 0;
 
     struct list_head *pos;
@@ -166,14 +166,36 @@ bool q_delete_mid(struct list_head *head)
 /* Delete all nodes that have duplicate string */
 bool q_delete_dup(struct list_head *head)
 {
-    // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+    if (!head || list_empty(head))
+        return false;
+
+    element_t *element, *next;
+    bool flag = false;
+
+    list_for_each_entry_safe (element, next, head, list) {
+        if (&next->list != head && strcmp(element->value, next->value) == 0) {
+            list_del_init(&element->list);
+            q_release_element(element);
+            flag = true;
+        } else if (flag) {
+            list_del_init(&element->list);
+            q_release_element(element);
+            flag = false;
+        }
+    }
+
     return true;
 }
 
 /* Swap every two adjacent nodes */
 void q_swap(struct list_head *head)
 {
-    // https://leetcode.com/problems/swap-nodes-in-pairs/
+    if (!head || list_empty(head))
+        return;
+
+    for (struct list_head *current = head->next;
+         current != head && current->next != head; current = current->next)
+        list_move(current, current->next);
 }
 
 /* Reverse elements in queue */
@@ -191,7 +213,19 @@ void q_reverse(struct list_head *head)
 /* Reverse the nodes of the list k at a time */
 void q_reverseK(struct list_head *head, int k)
 {
-    // https://leetcode.com/problems/reverse-nodes-in-k-group/
+    if (!head || list_empty(head) || k < 2)
+        return;
+
+    int length = q_size(head);
+    for (struct list_head *pos = head->next; pos != head && pos->next != head;
+         pos = pos->next) {
+        struct list_head **current = &pos->next, *tmp = pos->prev;
+        for (int i = 1; i < k; i++) {
+            if (length >= k)
+                list_move(*current, tmp);
+        }
+        length -= k;
+    }
 }
 
 /* Sort elements of queue in ascending order */
