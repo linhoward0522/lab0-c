@@ -1,8 +1,8 @@
+#include "queue.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "queue.h"
 
 /* Notice: sometimes, Cppcheck would find the potential NULL pointer bugs,
  * but some of them cannot occur. You can suppress them by adding the
@@ -227,8 +227,66 @@ void q_reverseK(struct list_head *head, int k)
     }
 }
 
+struct list_head *merge_list(struct list_head *left, struct list_head *right)
+{
+    struct list_head *head = NULL, **ptr = &head;
+
+    for (; left && right; ptr = &(*ptr)->next) {
+        if (strcmp(list_entry(left, element_t, list)->value,
+                   list_entry(right, element_t, list)->value) < 0) {
+            *ptr = left;
+            left = left->next;
+        } else {
+            *ptr = right;
+            right = right->next;
+        }
+    }
+
+    *ptr = (struct list_head *) ((uintptr_t) left | (uintptr_t) right);
+
+    return head;
+}
+struct list_head *merge_sort(struct list_head *head)
+{
+    if (!head || !head->next)
+        return head;
+    struct list_head *fast, *slow = head;
+
+    for (fast = head->next; fast && fast->next; fast = fast->next->next) {
+        slow = slow->next;
+    }
+
+    struct list_head *left, *right;
+
+    right = slow->next;
+    slow->next = NULL;
+
+    left = merge_sort(head);
+    right = merge_sort(right);
+
+    return merge_list(left, right);
+}
+
 /* Sort elements of queue in ascending order */
-void q_sort(struct list_head *head) {}
+void q_sort(struct list_head *head)
+{
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+
+    head->prev->next = NULL;
+    head->next = merge_sort(head->next);
+
+    struct list_head *cur = head, *n = head->next;
+
+    while (n) {
+        n->prev = cur;
+        cur = n;
+        n = n->next;
+    }
+
+    cur->next = head;
+    head->prev = cur;
+}
 
 /* Remove every node which has a node with a strictly greater value anywhere to
  * the right side of it */
