@@ -844,6 +844,51 @@ static bool do_merge(int argc, char *argv[])
     return ok && !error_check();
 }
 
+void swap(element_t *s1, element_t *s2)
+{
+    char *tmp = s1->value;
+    s1->value = s2->value;
+    s2->value = tmp;
+}
+
+void q_shuffle(struct list_head *head)
+{
+    if (!head || list_empty(head))
+        return;
+
+    struct list_head *tail = head->prev;
+
+    for (int i = q_size(head); i > 1; i--) {
+        int ran = rand() % i;
+        struct list_head *cur = head;
+        for (int j = 0; j <= ran; j++) {
+            cur = cur->next;
+        }
+        swap(list_entry(cur, element_t, list),
+             list_entry(tail, element_t, list));
+        tail = tail->prev;
+    }
+}
+
+static bool do_shuffle(int argc, char *argv[])
+{
+    if (argc != 1) {
+        report(1, "%s takes no arguments", argv[0]);
+        return false;
+    }
+
+    if (!current || !current->q)
+        report(3, "Warning: calling shuffle on null queue");
+    error_check();
+
+    if (exception_setup(true))
+        q_shuffle(current->q);
+    exception_cancel();
+
+    q_show(3);
+    return !error_check();
+}
+
 static bool is_circular()
 {
     struct list_head *cur = current->q->next;
@@ -1017,6 +1062,8 @@ static void console_init()
                 "");
     ADD_COMMAND(reverseK, "Reverse the nodes of the queue 'K' at a time",
                 "[K]");
+    ADD_COMMAND(shuffle, "Shuffle the queue by using Fisher–Yates shuffle", "");
+    ADD_COMMAND(swap, "Swap every two adjacent nodes in queue", "");
     add_param("length", &string_length, "Maximum length of displayed string",
               NULL);
     add_param("malloc", &fail_probability, "Malloc failure probability percent",

@@ -118,6 +118,7 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
     element_t *element = list_last_entry(head, element_t, list);
 
     list_del_init(head->prev);
+    // https://leetcode.com/problems/merge-k-sorted-lists/
     /*If sp is non-NULL and an element is removed, copy the removed string to
      *sp (up to a maximum of bufsize-1 characters, plus a null terminator.)*/
     if (sp) {
@@ -310,6 +311,8 @@ int q_descend(struct list_head *head)
 }
 int q_merge(struct list_head *head)
 {
-    // https://leetcode.com/problems/merge-k-sorted-lists/
+    if (list_is_singular(head))
+        return list_entry(head, queue_contex_t, chain)->size;
+
     return 0;
 }
