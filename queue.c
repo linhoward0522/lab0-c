@@ -309,10 +309,37 @@ int q_descend(struct list_head *head)
     }
     return q_size(head);
 }
+
 int q_merge(struct list_head *head)
 {
+    if (!head || list_empty(head))
+        return 0;
     if (list_is_singular(head))
-        return list_entry(head, queue_contex_t, chain)->size;
+        return list_entry(head->next, queue_contex_t, chain)->size;
 
-    return 0;
+    queue_contex_t *first = list_entry(head->next, queue_contex_t, chain);
+    queue_contex_t *pos = NULL;
+
+    struct list_head *tmp = first->q->next;
+    first->q->prev->next = NULL;
+    list_for_each_entry (pos, head, chain) {
+        if (first == pos)
+            continue;
+        pos->q->prev->next = NULL;
+        tmp = merge_list(tmp, pos->q->next);
+        INIT_LIST_HEAD(pos->q);
+    }
+    first->q->next = tmp;
+    struct list_head *cur = first->q, *n = cur->next;
+
+    while (n) {
+        n->prev = cur;
+        cur = n;
+        n = n->next;
+    }
+
+    cur->next = first->q;
+    first->q->prev = cur;
+
+    return q_size(tmp);
 }
