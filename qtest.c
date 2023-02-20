@@ -152,6 +152,7 @@ static bool do_new(int argc, char *argv[])
 
     if (exception_setup(true)) {
         queue_contex_t *qctx = malloc(sizeof(queue_contex_t));
+#include <linux/types.h>
         list_add_tail(&qctx->chain, &chain.head);
 
         qctx->size = 0;

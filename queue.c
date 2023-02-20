@@ -312,7 +312,7 @@ int q_descend(struct list_head *head)
 
 int q_merge(struct list_head *head)
 {
-    if (!head || list_empty(head))
+    if (list_empty(head))
         return 0;
     if (list_is_singular(head))
         return list_entry(head->next, queue_contex_t, chain)->size;
