@@ -152,7 +152,6 @@ static bool do_new(int argc, char *argv[])
 
     if (exception_setup(true)) {
         queue_contex_t *qctx = malloc(sizeof(queue_contex_t));
-#include <linux/types.h>
         list_add_tail(&qctx->chain, &chain.head);
 
         qctx->size = 0;
@@ -1407,7 +1406,6 @@ static void q_init()
 
 static bool q_quit(int argc, char *argv[])
 {
-    return true;
     report(3, "Freeing queue");
     if (current && current->size > BIG_LIST_SIZE)
         set_cautious_mode(false);
