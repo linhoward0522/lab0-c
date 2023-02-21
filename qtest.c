@@ -855,9 +855,9 @@ static bool do_merge(int argc, char *argv[])
 
 void swap(element_t *s1, element_t *s2)
 {
-    char *tmp = s1->value;
-    s1->value = s2->value;
-    s2->value = tmp;
+    *s1->value ^= *s2->value;
+    *s2->value ^= *s1->value;
+    *s1->value ^= *s2->value;
 }
 
 void q_shuffle(struct list_head *head)
