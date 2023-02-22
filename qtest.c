@@ -855,19 +855,19 @@ static bool do_merge(int argc, char *argv[])
 
 void swap(element_t *s1, element_t *s2)
 {
-    *s1->value ^= *s2->value;
-    *s2->value ^= *s1->value;
-    *s1->value ^= *s2->value;
+    char *tmp = s1->value;
+    s1->value = s2->value;
+    s2->value = tmp;
 }
 
 void q_shuffle(struct list_head *head)
 {
-    if (!head || list_empty(head))
+    if (!head || list_empty(head) || list_is_singular(head))
         return;
 
     struct list_head *tail = head->prev;
 
-    for (int i = q_size(head); i > 1; i--) {
+    for (int i = q_size(head); i > 0; i--) {
         int ran = rand() % i;
         struct list_head *cur = head;
         for (int j = 0; j <= ran; j++) {
