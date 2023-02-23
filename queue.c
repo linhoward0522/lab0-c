@@ -289,6 +289,90 @@ void q_sort(struct list_head *head)
     head->prev = cur;
 }
 
+/*Quick sort recursive*/
+
+/*void q_sort(struct list_head *head)
+{
+    if (list_empty(head) || list_is_singular(head))
+        return;
+
+    struct list_head list_less, list_greater;
+    INIT_LIST_HEAD(&list_less);
+    INIT_LIST_HEAD(&list_greater);
+
+    element_t *pivot = list_first_entry(head, element_t, list);
+    list_del(&pivot->list);
+
+    element_t *itm = NULL, *is = NULL;
+    list_for_each_entry_safe (itm, is, head, list) {
+        if (strcmp(itm->value, pivot->value) < 0)
+            list_move_tail (&itm->list, &list_less);
+        else
+            list_move_tail (&itm->list, &list_greater);
+    }
+
+    q_sort(&list_less);
+    q_sort(&list_greater);
+
+    list_add(&pivot->list, head);
+    list_splice(&list_less, head);
+    list_splice_tail(&list_greater, head);
+}
+*/
+
+/*Quick sort non-recursive*/
+/*
+#define MAX_DEPTH 512
+void q_sort(struct list_head *head)
+{
+    if (list_empty(head) || list_is_singular(head))
+        return;
+
+    struct list_head stack[MAX_DEPTH];
+    for (int i = 0; i < MAX_DEPTH; i++)
+        INIT_LIST_HEAD(&stack[i]);
+    int top = -1;
+    list_splice_init(head, &stack[++top]);
+
+    struct list_head partition;
+    INIT_LIST_HEAD(&partition);
+
+    while (top >= 0) {
+        INIT_LIST_HEAD(&partition);
+        list_splice_init(&stack[top--], &partition);
+        if (!list_empty(&partition) && !list_is_singular(&partition)) {
+            struct list_head list_less, list_greater;
+            INIT_LIST_HEAD(&list_less);
+            INIT_LIST_HEAD(&list_greater);
+            element_t *pivot = list_first_entry(&partition, element_t, list);
+            list_del(&pivot->list);
+            INIT_LIST_HEAD(&pivot->list);
+
+            element_t *itm = NULL, *is = NULL;
+            list_for_each_entry_safe (itm, is, &partition, list) {
+                if (strcmp(itm->value, pivot->value) < 0)
+                    list_move(&itm->list, &list_less);
+                else
+                    list_move(&itm->list, &list_greater);
+            }
+
+            list_move_tail(&pivot->list, &list_less);
+            if (!list_empty(&list_greater))
+                list_splice_tail(&list_greater, &stack[++top]);
+            if (!list_empty(&list_less))
+                list_splice_tail(&list_less, &stack[++top]);
+        } else {
+            top++;
+            list_splice_tail(&partition, &stack[top]);
+            while (top >= 0 && list_is_singular(&stack[top])) {
+                element_t *tmp = list_first_entry(&stack[top], element_t, list);
+                INIT_LIST_HEAD(&stack[top--]);
+                list_move_tail(&tmp->list, head);
+            }
+        }
+    }
+}*/
+
 /* Remove every node which has a node with a strictly greater value anywhere to
  * the right side of it */
 int q_descend(struct list_head *head)
